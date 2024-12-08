@@ -249,6 +249,48 @@ class BasePlugin:
         return {}
 
 
+class DeepseekvlPlugin(BasePlugin):
+    @override
+    def process_messages(
+        self,
+        messages: Sequence[Dict[str, str]],
+        images: Sequence["ImageInput"],
+        videos: Sequence["VideoInput"],
+        processor: Optional["ProcessorMixin"],
+    ) -> List[Dict[str, str]]:
+        self._validate_input(images, videos)
+        num_image_tokens = 0
+        image_seqlen = getattr(processor, "image_seqlen") if self.expand_mm_tokens else 1
+        messages = deepcopy(messages)
+        for message in messages:
+            content = message["content"]
+            while IMAGE_PLACEHOLDER in content:
+                num_image_tokens += 1
+                content = content.replace(IMAGE_PLACEHOLDER, "{{image}}" * image_seqlen, 1)
+
+            message["content"] = content.replace("{{image}}", self.image_token)
+
+        if len(images) != num_image_tokens:
+            raise ValueError(f"The number of images does not match the number of {IMAGE_PLACEHOLDER} tokens.")
+
+        return messages
+
+    @override
+    def get_mm_inputs(
+        self,
+        images: Sequence["ImageInput"],
+        videos: Sequence["VideoInput"],
+        imglens: Sequence[int],
+        vidlens: Sequence[int],
+        batch_ids: Sequence[List[int]],
+        processor: Optional["ProcessorMixin"],
+    ) -> Dict[str, Union[List[int], "torch.Tensor"]]:
+        self._validate_input(images, videos)
+        return self._get_mm_inputs(images, videos, processor)
+
+
+
+
 class LlavaPlugin(BasePlugin):
     @override
     def process_messages(
@@ -790,6 +832,7 @@ class MllamaPlugin(BasePlugin):
 
 PLUGINS = {
     "base": BasePlugin,
+    "deepseek_vl": DeepseekvlPlugin,
     "llava": LlavaPlugin,
     "llava_next": LlavaNextPlugin,
     "llava_next_video": LlavaNextVideoPlugin,

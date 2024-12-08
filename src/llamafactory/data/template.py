@@ -629,6 +629,25 @@ _register_template(
 )
 
 
+# TODO deepseek_vl
+_register_template(
+    name="deepseek_vl",
+    format_user=StringFormatter(slots=["User: {{content}}\n\nAssistant:"]),
+    format_system=StringFormatter(slots=["{{content}}\n\n"]),
+    format_separator=StringFormatter(slots=["<｜end▁of▁sentence｜>"]),
+    format_prefix=StringFormatter(slots=["<｜begin▁of▁sentence｜>"]),
+    default_system=(
+        "You are a helpful language and vision assistant. "
+        "You are able to understand the visual content that the user provides, "
+        "and assist the user with a variety of tasks using natural language."
+    ),
+    stop_words=["<｜end▁of▁sentence｜>"],
+    replace_eos=True,
+    replace_jinja_template=False,
+    mm_plugin=get_mm_plugin(name="deepseek_vl", image_token="<image_placeholder>"),
+)
+
+
 _register_template(
     name="default",
     format_user=StringFormatter(slots=["Human: {{content}}\nAssistant:"]),

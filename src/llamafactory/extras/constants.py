@@ -479,6 +479,22 @@ register_model_group(
 
 register_model_group(
     models={
+        "deepseek-vl-1.3b-chat": {
+            DownloadSource.DEFAULT: "deepseek-ai/deepseek-vl-1.3b-chat",
+            DownloadSource.MODELSCOPE: "deepseek-ai/deepseek-vl-1.3b-chat",
+        },
+        "deepseek-vl-7b-chat": {
+            DownloadSource.DEFAULT: "deepseek-ai/deepseek-vl-7b-chat",
+            DownloadSource.MODELSCOPE: "deepseek-ai/deepseek-vl-7b-chat",
+        },
+    },
+    template="deepseek_vl",
+    vision=True,
+)
+
+
+register_model_group(
+    models={
         "EXAONE-3.0-7.8B-Instruct": {
             DownloadSource.DEFAULT: "LGAI-EXAONE/EXAONE-3.0-7.8B-Instruct",
         },
